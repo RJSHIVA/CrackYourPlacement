@@ -1,0 +1,75 @@
+// class Solution {
+
+//     class pair{
+//         int max; 
+//         int sum;
+//         pair(int max, int sum){
+//             this.max = max;
+//             this.sum = sum;
+//         }
+//     }
+
+//     public int mctFromLeafValues(int[] arr) {
+//         int n = arr.length;
+//         return helper(arr,0,n-1,new pair[n][n]).sum;
+//     }
+
+//     public pair helper(int arr[], int left, int right, pair dp[][]){
+//         if(left>right){
+//             return new pair(0,1000000);
+//         }
+
+//         if(left==right){
+//             return new pair(arr[left],0);
+//         }
+        
+//         if(dp[left][right]!=null){
+//             return dp[left][right];
+//         }
+
+//         pair ans = new pair(0,1000000);
+
+//         for(int i=left; i<right; i++){
+//             pair p_left = helper(arr,left,i,dp);
+//             pair p_right = helper(arr,i+1,right,dp);
+//             int total = (p_left.sum+p_right.sum) + (p_left.max*p_right.max);
+//             if(total<ans.sum){
+//                  ans.max = Math.max(p_left.max,p_right.max);
+//                  ans.sum = total;
+//             }  
+//         }
+
+//         dp[left][right] = new pair(ans.max,ans.sum);
+//         return ans;
+//     }
+// }
+
+class Solution {
+    public int mctFromLeafValues(int[] arr) {
+        Stack<Integer> stack = new Stack<>(); // Stack to maintain the elements
+        int count = 0; // Total cost
+        
+        for(int x : arr) {
+            if(stack.isEmpty() || stack.peek() >= x) {
+                stack.push(x); // Push if stack is empty or top is >= x
+            } else {
+                while(!stack.isEmpty() && stack.peek() < x) {
+                    int cur = stack.pop(); // Pop elements less than x
+                    if(stack.isEmpty() || stack.peek() >= x) {
+                        count += cur * x; // Add product of cur and x to count
+                    } else {
+                        count += cur * stack.peek(); // Add product of cur and new top to count
+                    }
+                }
+                stack.push(x); // Push the current element
+            }
+        }
+
+        // Process remaining elements in the stack
+        while(stack.size() > 1) {
+            count += stack.pop() * stack.peek(); // Add product of top two elements
+        }
+        
+        return count; // Return the total cost
+    }
+}
